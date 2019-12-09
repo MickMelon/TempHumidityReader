@@ -15,11 +15,8 @@ function getSensorData() {
         var dates = [];
 
         $.each(jsondata, function (i) {
-           // var data = jsondata[i].JsonData;
-           // var obj = $.parseJSON(data);
-
-            humidity.push(parseInt(jsondata[i].humidity));
-            temperature.push(parseInt(jsondata[i].external));
+            humidity.push(parseFloat(jsondata[i].humidity));
+            temperature.push(parseFloat(jsondata[i].temperature));
             dates.push(jsondata[i].datetime);
         });
 
