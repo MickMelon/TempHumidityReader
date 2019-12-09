@@ -11,7 +11,7 @@ class ApiController {
     }
 
     public function get() {
-        if (isset($_GET['time'])) {
+        if (isset($_GET['time']) && (strtolower($time) != 'all')) {
             $data = $this->sensorModel->time($_GET['time'], 1);
         } else {
             $data = $this->sensorModel->all();
