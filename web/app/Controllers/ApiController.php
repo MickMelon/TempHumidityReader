@@ -12,7 +12,7 @@ class ApiController {
 
     public function get() {
         if (isset($_GET['time'])) {
-            $data = $this->sensorModel->time($_GET['time']);
+            $data = $this->sensorModel->time($_GET['time'], 1);
         } else {
             $data = $this->sensorModel->all();
         }        
