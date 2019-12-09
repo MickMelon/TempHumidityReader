@@ -12,19 +12,7 @@ class ApiController {
 
     public function get() {
         if (isset($_GET['time'])) {
-            $time = strtolower($_GET['time']);
-
-            if ($time == 'month') {
-                $data = $this->sensorModel->lastMonth();
-            } elseif ($time == 'week') {
-                $data = $this->sensorModel->lastWeek();
-            } elseif ($time == 'day') {
-                $data = $this->sensorModel->lastDay();
-            } elseif ($time == 'hour') {
-                $data = $this->sensorModel->lastHour();
-            } else {
-                $data = $this->sensorModel->all();
-            }
+            $data = $this->sensorModel->time($_GET['time']);
         } else {
             $data = $this->sensorModel->all();
         }        

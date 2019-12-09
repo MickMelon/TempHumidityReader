@@ -5,45 +5,14 @@ use App\Database;
 use PDO;
 
 class SensorModel {
-    public function lastHour() {
+    public function time($time, $qty) {
         $db = Database::getInstance();
 
         $sql = 'SELECT * FROM sensor_readings ' .
-               'WHERE datetime >= DATE_SUB(NOW(), INTERVAL 1 HOUR)';
+               'WHERE datetime >= DATE_SUB(NOW(), INTERVAL :qty :time)';
         $query = $db->prepare($sql);
-        $query->execute();
-
-        return json_encode($query->fetchAll());
-    }
-
-    public function lastDay() {
-        $db = Database::getInstance();
-
-        $sql = 'SELECT * FROM sensor_readings ' .
-               'WHERE datetime >= DATE_SUB(NOW(), INTERVAL 1 DAY)';
-        $query = $db->prepare($sql);
-        $query->execute();
-
-        return json_encode($query->fetchAll());
-    }
-
-    public function lastWeek() {
-        $db = Database::getInstance();
-
-        $sql = 'SELECT * FROM sensor_readings ' .
-               'WHERE datetime >= DATE_SUB(NOW(), INTERVAL 1 WEEK)';
-        $query = $db->prepare($sql);
-        $query->execute();
-
-        return json_encode($query->fetchAll());
-    }
-
-    public function lastMonth() {
-        $db = Database::getInstance();
-
-        $sql = 'SELECT * FROM sensor_readings ' .
-               'WHERE datetime >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
-        $query = $db->prepare($sql);
+        $query->bindParam(':time', strtoupper($time), PDO::PARAM_STR);
+        $query->bindParam(':qty', strtoupper($qty), PDO::PARAM_INT);
         $query->execute();
 
         return json_encode($query->fetchAll());
