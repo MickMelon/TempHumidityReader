@@ -30,8 +30,8 @@ class ApiController {
         $jsonbody = file_get_contents('php://input');
         $json = json_decode($jsonbody, false);
 
-        echo 'The JSON is: ' . $json->temperature . ' and ' . $json->humidity;
+        echo "Received data: [temp:$json->temperature|hum:$json->humidity|systmp:$json->system_temp]";
 
-        $this->sensorModel->save($json->temperature, $json->humidity);
+        $this->sensorModel->save($json->temperature, $json->humidity, $json->system_temp);
     }
 }
