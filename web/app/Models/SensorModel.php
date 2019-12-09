@@ -11,8 +11,8 @@ class SensorModel {
         $sql = 'SELECT * FROM sensor_readings ' .
                'WHERE datetime >= DATE_SUB(NOW(), INTERVAL :qty :time)';
         $query = $db->prepare($sql);
-        $query->bindParam(':time', strtoupper($time), PDO::PARAM_STR);
-        $query->bindParam(':qty', strtoupper($qty), PDO::PARAM_INT);
+        $query->bindParam(':time', $time, PDO::PARAM_STR);
+        $query->bindParam(':qty', $qty, PDO::PARAM_INT);
         $query->execute();
 
         return json_encode($query->fetchAll());
