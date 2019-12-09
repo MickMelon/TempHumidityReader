@@ -12,4 +12,7 @@ double getTemperature(int fd);
 // Get humidity
 double getHumidity(int fd);
 
+// Get system temperature
+double getSystemTemperature();
+
 #endif

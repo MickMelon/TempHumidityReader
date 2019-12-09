@@ -2,8 +2,31 @@
 
 #include "wiringPi.h"
 #include "wiringPiI2C.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "HTU21D.h"
+
+#define PATH_MAX 100
+
+double getSystemTemperature() {
+	FILE *fp;
+	char path[PATH_MAX];
+	char *ptr;
+	double systemTemp = 0.0;
+
+	fp = popen("vcgencmd measure_temp | egrep -o '[0-9]*\\.[0-9]*'", "r");
+	if (fp == NULL) {
+		printf("Could not read system temperature\n");
+		return 0;
+	}
+
+	while (fgets(path, PATH_MAX, fp) != NULL) {
+		systemTemp = strtod(path, &ptr);
+	}
+
+	return systemTemp;
+}
 
 // Get temperature
 double getTemperature(int fd)

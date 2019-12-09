@@ -15,7 +15,7 @@ class SensorModel {
         $db = Database::getInstance();
 
         $sql = 'SELECT * FROM sensor_readings ' .
-               "WHERE datetime >= DATE_SUB(NOW(), INTERVAL $qty $time)";
+               "WHERE datetime >= DATE_SUB(NOW(), INTERVAL $qty $time) LIMIT 10";
         $query = $db->prepare($sql);
         $query->execute();
 
@@ -25,21 +25,22 @@ class SensorModel {
     public function all() {
         $db = Database::getInstance();
 
-        $sql = 'SELECT * FROM sensor_readings';
+        $sql = 'SELECT * FROM sensor_readings LIMIT 10';
         $query = $db->prepare($sql);
         $query->execute();
 
         return json_encode($query->fetchAll());
     }
 
-    public function save($temperature, $humidity) {
+    public function save($temperature, $humidity, $systemTemp) {
         $db = Database::getInstance();
 
-        $sql = 'INSERT INTO sensor_readings (humidity, temperature) ' .
-               'VALUES (:humidity, :temperature)';
+        $sql = 'INSERT INTO sensor_readings (humidity, temperature, system_temp) ' .
+               'VALUES (:humidity, :temperature, :system_temp)';
         $query = $db->prepare($sql);
         $query->bindParam(':humidity', $humidity, PDO::PARAM_STR);
         $query->bindParam(':temperature', $temperature, PDO::PARAM_STR);
+        $query->bindParam(':system_temp', $systemTemp, PDO::PARAM_STR);
 
         $query->execute();
     }

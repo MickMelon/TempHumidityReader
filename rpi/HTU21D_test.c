@@ -9,7 +9,7 @@
 
 #include "HTU21D.h"
 
-int sendToServer(double temperature, double humidity) {
+int sendToServer(double temperature, double humidity, double systemTemp) {
 	CURL *curl;
 	CURLcode res;
 
@@ -20,14 +20,15 @@ int sendToServer(double temperature, double humidity) {
 	}
 
 	char jsonObj[100];
-	sprintf(jsonObj, "{ \"temperature\": \"%lf\", \"humidity\": \"%lf\" }", temperature, humidity);
+	sprintf(jsonObj, "{ \"temperature\": \"%lf\", \"humidity\": \"%lf\", \"system_temp\": \"%lf\" }",
+		temperature, humidity, systemTemp);
 
 	struct curl_slist *headers = NULL;
 	headers = curl_slist_append(headers, "Accept: application/json");
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	headers = curl_slist_append(headers, "charsets: utf-8");
 
-	curl_easy_setopt(curl, CURLOPT_URL, "https://3.81.115.141/index.php?c=api&a=create");
+	curl_easy_setopt(curl, CURLOPT_URL, "https://3.81.115.141/api/create");
 
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
@@ -48,13 +49,15 @@ int sendToServer(double temperature, double humidity) {
 void sendPeriodically(int fd) {
 	double temperature = getTemperature(fd);
 	double humidity = getHumidity(fd);
+	double systemTemp = getSystemTemperature();
 	
-	printf("%5.2fC\n", temperature);
-	printf("%5.2f%%rh\n", humidity);
+	printf("Sensor temp: %5.2fC\n", temperature);
+	printf("Humidity: %5.2f%%rh\n", humidity);
+	printf("System temp: %5.2fC", systemTemp);
 
 	printf("Sending to server...\n");
 
-	int res = sendToServer(temperature, humidity);
+	int res = sendToServer(temperature, humidity, systemTemp);
 	
 	printf("Sent to server. got result code: %i \n", res);
 }
