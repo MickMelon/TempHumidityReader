@@ -46,14 +46,21 @@ int sendToServer(double temperature, double humidity, double systemTemp) {
 	return res;
 }
 
-void sendPeriodically(int fd) {
+void sendPeriodically() {
+	int fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
+	if ( 0 > fd )
+	{
+		fprintf (stderr, "Unable to open I2C device: %s\n", strerror (errno));
+		exit (-1);
+	}
+	
 	double temperature = getTemperature(fd);
 	double humidity = getHumidity(fd);
 	double systemTemp = getSystemTemperature();
 	
 	printf("Sensor temp: %5.2fC\n", temperature);
 	printf("Humidity: %5.2f%%rh\n", humidity);
-	printf("System temp: %5.2fC", systemTemp);
+	printf("System temp: %5.2fC\n", systemTemp);
 
 	printf("Sending to server...\n");
 
@@ -64,16 +71,9 @@ void sendPeriodically(int fd) {
 
 int main() {
 	wiringPiSetup();
-	int fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
-	if ( 0 > fd )
-	{
-		fprintf (stderr, "Unable to open I2C device: %s\n", strerror (errno));
-		exit (-1);
-	}
-
-	
+		
 	while (1) {
-		sendPeriodically(fd);
+		sendPeriodically();
 		sleep(1);
 	}
 
