@@ -5,6 +5,7 @@
 #include "wiringPi.h"
 #include "wiringPiI2C.h"
 #include <curl/curl.h>
+#include <unistd.h>
 
 #include "HTU21D.h"
 
@@ -44,16 +45,7 @@ int sendToServer(double temperature, double humidity) {
 	return res;
 }
 
-int main ()
-{
-	wiringPiSetup();
-	int fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
-	if ( 0 > fd )
-	{
-		fprintf (stderr, "Unable to open I2C device: %s\n", strerror (errno));
-		exit (-1);
-	}
-
+void sendPeriodically(int fd) {
 	double temperature = getTemperature(fd);
 	double humidity = getHumidity(fd);
 	
@@ -65,6 +57,22 @@ int main ()
 	int res = sendToServer(temperature, humidity);
 	
 	printf("Sent to server. got result code: %i \n", res);
+}
+
+int main() {
+	wiringPiSetup();
+	int fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
+	if ( 0 > fd )
+	{
+		fprintf (stderr, "Unable to open I2C device: %s\n", strerror (errno));
+		exit (-1);
+	}
+
+	
+	while (1) {
+		sendPeriodically(fd);
+		sleep(1);
+	}
 
 	return 0;
 }
