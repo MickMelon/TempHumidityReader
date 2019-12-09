@@ -16,7 +16,7 @@ class ApiController {
      * @return void
      */
     public function create() {
-        if (isset($_GET['temperature']) && isset($_GET['humidity'])) {
+       /* if (isset($_GET['temperature']) && isset($_GET['humidity'])) {
             $temperature = $_GET['temperature'];
             $humidity = $_GET['humidity'];
 
@@ -25,6 +25,14 @@ class ApiController {
             return;
         }
 
-        echo 'Invalid parameters specified';
+        echo 'Invalid parameters specified';*/
+
+        $jsonbody = file_get_contents('php://input');
+        $json = json_decode($jsonbody, false);
+
+        echo '********\n';
+        echo 'The JSON is: ' . $json->temperature . ' and ' . $json->humidity;
+
+        $this->sensorModel->save($json->temperature, $json->humidity);
     }
 }

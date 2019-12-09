@@ -13,8 +13,8 @@ class Router {
         // that are set.
         // e.g. index.php?controller=articles&action=index
         // would set $controller to articles and $action to index
-        $controller = isset($_GET['controller']) ? strtolower($_GET['controller']) : 'article';
-        $action = isset($_GET['action']) ? strtolower($_GET['action']) : 'index';
+        $controller = isset($_GET['c']) ? strtolower($_GET['c']) : 'home';
+        $action = isset($_GET['a']) ? strtolower($_GET['a']) : 'index';
 
         // Check to see if the class and method exist, if they do, call it.
         $className = 'App\Controllers\\' . ucfirst($controller) . 'Controller';
