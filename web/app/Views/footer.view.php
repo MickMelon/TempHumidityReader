@@ -9,7 +9,7 @@ $(document).ready(function () {
 });
 
 function getSensorData() {
-    $.getJSON('index.php?c=api&a=read', function (jsondata) {
+    $.getJSON('api/read', function (jsondata) {
         var humidity = [];
         var temperature = [];
         var dates = [];
@@ -79,7 +79,7 @@ function getSensorData() {
                     }]
                 }
             }
-        })
+        });
 
         // Periodically refresh
         setTimeout(getSensorData, 5000);

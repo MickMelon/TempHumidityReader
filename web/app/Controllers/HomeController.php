@@ -17,13 +17,6 @@ class HomeController {
      * @return void
      */
     public function index() {
-        $all = $this->sensorModel->all();
-
-        header("content-type: application/json");
-        echo $all;
-    }
-
-    public function test() {
         $view = new View('home');
         $view->render();
     }
