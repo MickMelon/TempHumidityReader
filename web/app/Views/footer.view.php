@@ -9,7 +9,9 @@ $(document).ready(function () {
 });
 
 function getSensorData() {
-    $.getJSON('api/read', function (jsondata) {
+    var radioValue = $("input[name='time']:checked").val();
+    var url = '/api/get?time=' + radioValue;
+    $.getJSON(url, function (jsondata) {
         var humidity = [];
         var temperature = [];
         var dates = [];
