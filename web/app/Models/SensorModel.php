@@ -6,13 +6,17 @@ use PDO;
 
 class SensorModel {
     public function time($time, $qty) {
+        if (!in_array($time, ['hour', 'day', 'week', 'month'])) {
+            return json_encode('time param is invalid');
+        } elseif ($qty < 0 || $qty > 100) {
+            return json_encode('qty param is invalid');
+        }
+
         $db = Database::getInstance();
 
         $sql = 'SELECT * FROM sensor_readings ' .
-               'WHERE datetime >= DATE_SUB(NOW(), INTERVAL :qty :time)';
+               "WHERE datetime >= DATE_SUB(NOW(), INTERVAL $qty $time)";
         $query = $db->prepare($sql);
-        $query->bindParam(':time', $time, PDO::PARAM_STR);
-        $query->bindParam(':qty', $qty, PDO::PARAM_INT);
         $query->execute();
 
         return json_encode($query->fetchAll());
