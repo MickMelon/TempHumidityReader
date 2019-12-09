@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\SensorModel;
+use App\View;
 
 class HomeController {
     private $sensorModel;
@@ -20,5 +21,10 @@ class HomeController {
 
         header("content-type: application/json");
         echo $all;
+    }
+
+    public function test() {
+        $view = new View('home');
+        $view->render();
     }
 }

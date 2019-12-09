@@ -10,6 +10,13 @@ class ApiController {
         $this->sensorModel = new SensorModel();
     }
 
+    public function get() {
+        $all = $this->sensorModel->all();
+
+        header("content-type: application/json");
+        echo $all;
+    }
+
     /**
      * Creates a new sensor reading entry.
      *
