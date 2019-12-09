@@ -26,12 +26,16 @@ int sendToServer(double temperature, double humidity) {
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	headers = curl_slist_append(headers, "charsets: utf-8");
 
-	curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.1.6/~michael/miniproject/web/index.php?c=api&a=create");
+	curl_easy_setopt(curl, CURLOPT_URL, "https://3.81.115.141/index.php?c=api&a=create");
 
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonObj);
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.0.3705; .NET CLR 1.1.4322)");
+
+	// To prevent issue with self signed certificate
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0);
+	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
 
 	res = curl_easy_perform(curl);
 
