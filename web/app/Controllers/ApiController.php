@@ -2,6 +2,7 @@
 namespace App\Controllers;
 
 use App\Models\SensorModel;
+use App\Json;
 
 class ApiController {
     private $sensorModel;
@@ -13,8 +14,8 @@ class ApiController {
     public function latest() {
         $latest = $this->sensorModel->latest();
 
-        header("content-type: application/json");
-        echo $latest;
+        $json = new Json($latest, true);
+        $json->show();
     }
 
     public function get() {
@@ -24,8 +25,8 @@ class ApiController {
             $data = $this->sensorModel->all();
         }        
 
-        header("content-type: application/json");
-        echo $data;
+        $json = new Json($data, true);
+        $json->show();
     }
 
     /**
@@ -37,8 +38,8 @@ class ApiController {
         $jsonbody = file_get_contents('php://input');
         $json = json_decode($jsonbody, false);
 
-        echo "Received data: [temp:$json->temperature|hum:$json->humidity|systmp:$json->system_temp]";
-
         $this->sensorModel->save($json->temperature, $json->humidity, $json->system_temp);
+
+        $showJson = new Json(['message' => "Received data: [temp:$json->temperature|hum:$json->humidity|systmp:$json->system_temp]"]);
     }
 }

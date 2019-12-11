@@ -36,7 +36,7 @@ class View
     /**
      * Display the view with the header and footer.
      */
-    public function render()
+    public function show()
     {
         extract($this->data); 
         include(View::HEADER_FILE);
