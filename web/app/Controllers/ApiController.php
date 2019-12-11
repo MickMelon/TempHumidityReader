@@ -10,6 +10,13 @@ class ApiController {
         $this->sensorModel = new SensorModel();
     }
 
+    public function latest() {
+        $latest = $this->sensorModel->latest();
+
+        header("content-type: application/json");
+        echo $latest;
+    }
+
     public function get() {
         if (isset($_GET['time']) && (strtolower($_GET['time']) != 'all')) {
             $data = $this->sensorModel->time($_GET['time'], 1);

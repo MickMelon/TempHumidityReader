@@ -8,3 +8,9 @@
     <input type="radio" name="time" value="week">Week<br />
     <input type="radio" name="time" value="month">Month<br />
 </div>
+
+<hr />
+
+<h3 id="temp"></h3>
+<h3 id="systemTemp"></h3>
+<h3 id="humidity"></h3>

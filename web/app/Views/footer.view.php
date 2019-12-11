@@ -6,9 +6,25 @@
 <script>
 $(document).ready(function () {
     getSensorData();
+    updateCurrentReadings();
 });
 
+function updateCurrentReadings() {
+    $.getJSON(url, function (jsondata) {
+        var temp = parseFloat(jsondata.temperature);
+        var systemTemp = parseFloat(jsondata.systemTemp);
+        var humidity = parseFloat(jsondata.humidity);
+
+        $('temp').text('Temperature: ' + temp + 'C');
+        $('systemTemp').text('System Temperature: ' + systemTemp + 'C');
+        $('humidity').text('Humidity: ' + humidity + '%h');
+    });
+
+    setTimeout(updateCurrentReadings, 5000);
+}
+
 function getSensorData() {
+    // Update chart
     var radioValue = $("input[name='time']:checked").val();
     var url = '/api/get?time=' + radioValue;
     $.getJSON(url, function (jsondata) {
@@ -82,10 +98,10 @@ function getSensorData() {
                 }
             }
         });
-
-        // Periodically refresh
-        setTimeout(getSensorData, 5000);
     });
+
+    // Periodically refresh
+    setTimeout(getSensorData, 5000);
 }
 </script>
 </body>
