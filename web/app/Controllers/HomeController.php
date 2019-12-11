@@ -18,6 +18,6 @@ class HomeController {
      */
     public function index() {
         $view = new View('home');
-        $view->render();
+        $view->show();
     }
 }
