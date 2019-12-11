@@ -56,17 +56,19 @@ void sendPeriodically() {
 		exit (-1);
 	}
 	
-	double temperature = getTemperature(fd);
-	double humidity = getHumidity(fd);
-	double systemTemp = getSystemTemperature();
+//	double temperature = getTemperature(fd);
+//	//double humidity = getHumidity(fd);
+//	double systemTemp = getSystemTemperature();
+
+	struct Reading r = getReading(fd);
 	
-	printf("Sensor temp: %5.2fC\n", temperature);
-	printf("Humidity: %5.2f%%rh\n", humidity);
-	printf("System temp: %5.2fC\n", systemTemp);
+	printf("\nSensor temp: %5.2fC\n", r.temperature);
+	printf("Humidity: %5.2f%%rh\n", r.humidity);
+	//printf("System temp: %5.2fC\n", systemTemp);
 
 	printf("Sending to server...\n");
 
-	int res = sendToServer(temperature, humidity, systemTemp);
+	int res = sendToServer(r.temperature, r.humidity, 0);
 	
 	printf("Sent to server. got result code: %i \n", res);
 }
