@@ -11,13 +11,13 @@ $(document).ready(function () {
 
 function updateCurrentReadings() {
     $.getJSON('/api/latest', function (jsondata) {
-        var temp = parseFloat(jsondata.temperature);
-        var systemTemp = parseFloat(jsondata.systemTemp);
-        var humidity = parseFloat(jsondata.humidity);
+        var temp = jsondata.temperature;
+        var systemTemp = jsondata.system_temp;
+        var humidity = jsondata.humidity;
 
-        $('temp').text('Temperature: ' + temp + 'C');
-        $('systemTemp').text('System Temperature: ' + systemTemp + 'C');
-        $('humidity').text('Humidity: ' + humidity + '%h');
+        $('#temp').text('Temperature: ' + temp + 'C');
+        $('#systemTemp').text('System Temperature: ' + systemTemp + 'C');
+        $('#humidity').text('Humidity: ' + humidity + '%h');
     });
 
     setTimeout(updateCurrentReadings, 5000);
