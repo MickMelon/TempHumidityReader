@@ -10,7 +10,7 @@ $(document).ready(function () {
 });
 
 function updateCurrentReadings() {
-    $.getJSON(url, function (jsondata) {
+    $.getJSON('/api/latest', function (jsondata) {
         var temp = parseFloat(jsondata.temperature);
         var systemTemp = parseFloat(jsondata.systemTemp);
         var humidity = parseFloat(jsondata.humidity);
