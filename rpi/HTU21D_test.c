@@ -9,6 +9,8 @@
 
 #include "HTU21D.h"
 
+#define API_ADDRESS "https://35.174.12.122/api/create"
+
 int sendToServer(double temperature, double humidity, double systemTemp) {
 	CURL *curl;
 	CURLcode res;
@@ -28,7 +30,7 @@ int sendToServer(double temperature, double humidity, double systemTemp) {
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	headers = curl_slist_append(headers, "charsets: utf-8");
 
-	curl_easy_setopt(curl, CURLOPT_URL, "https://3.81.115.141/api/create");
+	curl_easy_setopt(curl, CURLOPT_URL, API_ADDRESS);
 
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
