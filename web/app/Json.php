@@ -21,7 +21,7 @@ class Json
     public function __construct($data, $encoded = false) 
     {
         if (!$encoded) {
-            $data = json_encode($data)
+            $data = json_encode($data);
         }
 
         $this->data = $data;
