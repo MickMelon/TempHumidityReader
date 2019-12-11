@@ -15,7 +15,7 @@ class SensorModel {
         $db = Database::getInstance();
 
         $sql = 'SELECT * FROM sensor_readings ' .
-               "WHERE datetime >= DATE_SUB(NOW(), INTERVAL $qty $time) LIMIT 10";
+               "WHERE datetime >= DATE_SUB(NOW(), INTERVAL $qty $time)";
         $query = $db->prepare($sql);
         $query->execute();
 
@@ -25,7 +25,7 @@ class SensorModel {
     public function all() {
         $db = Database::getInstance();
 
-        $sql = 'SELECT * FROM sensor_readings LIMIT 10';
+        $sql = 'SELECT * FROM sensor_readings';
         $query = $db->prepare($sql);
         $query->execute();
 
