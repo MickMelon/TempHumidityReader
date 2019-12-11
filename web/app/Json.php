@@ -20,7 +20,11 @@ class Json
      */
     public function __construct($data, $encoded = false) 
     {
-        $this->data = json_encode($data);
+        if (!$encoded) {
+            $data = json_encode($data)
+        }
+
+        $this->data = $data;
     }
 
     /**
