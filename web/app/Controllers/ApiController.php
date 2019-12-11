@@ -13,8 +13,6 @@ class ApiController {
     }
 
     public function latest() {
-        if (!$this->validateClient()) return;
-
         $latest = $this->sensorModel->latest();
 
         $json = new Json($latest, true);
@@ -22,8 +20,6 @@ class ApiController {
     }
 
     public function get() {
-        if (!$this->validateClient()) return;
-
         if (isset($_GET['time']) && (strtolower($_GET['time']) != 'all')) {
             $data = $this->sensorModel->time($_GET['time'], 1);
         } else {
@@ -40,8 +36,8 @@ class ApiController {
      * @return void
      */
     public function create() {
-        if (!$this->validateClient()) return;
-
+        if (!$this->validateClient()) return response_code(403);
+        
         $jsonbody = file_get_contents('php://input');
         $json = json_decode($jsonbody, false);
 
