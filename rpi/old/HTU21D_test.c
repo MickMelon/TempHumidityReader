@@ -11,7 +11,32 @@
 
 #define API_ADDRESS "https://35.174.12.122/api/create"
 
-int sendToServer(double temperature, double humidity, double systemTemp) {
+
+float getSystemTemperature() {
+	FILE *fp;
+	char path[100];
+	char *ptr;
+	double systemTemp;
+
+	fp = popen("vcgencmd measure_temp | egrep -o '[0-9]*\\.[0-9]*'", "r");
+	if (fp == NULL) {
+		printf("Could not read system temperature\n");
+		return 0;
+	}
+
+	while (fgets(path, 100, fp) != NULL) {
+		systemTemp = strtod(path, &ptr);
+	}
+
+	pclose(fp);
+
+	return (float)systemTemp;
+}
+
+/**
+ * Makes a HTTP POST request to the AWS server with the sensor readings.
+ */ 
+int sendToServer(float temperature, float humidity, float systemTemp) {
 	CURL *curl;
 	CURLcode res;
 

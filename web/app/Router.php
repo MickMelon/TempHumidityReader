@@ -16,9 +16,9 @@ class Router {
         $controller = isset($_GET['c']) ? strtolower($_GET['c']) : 'home';
         $action = isset($_GET['a']) ? strtolower($_GET['a']) : 'index';
 
-        // Check to see if the class and method exist, if they do, call it.
         $className = 'App\Controllers\\' . ucfirst($controller) . 'Controller';
 
+        // Check to see if the class and method exist, if they do, call it.      
         if (class_exists($className, true)) {
             $controllerClass = new $className();
             if (method_exists($controllerClass, $action)) {

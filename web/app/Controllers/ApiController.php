@@ -36,8 +36,11 @@ class ApiController {
      * @return void
      */
     public function create() {
-        if (!$this->validateClient()) return response_code(403);
-        
+        if (!$this->validateClient()) {
+            http_response_code(403);
+            die('You are not allowed to access this.');
+        }
+
         $jsonbody = file_get_contents('php://input');
         $json = json_decode($jsonbody, false);
 
