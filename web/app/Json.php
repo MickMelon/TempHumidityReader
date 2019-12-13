@@ -1,8 +1,7 @@
 <?php
 namespace App;
 
-class Json
-{
+class Json {
     /**
      * The Json data.
      *

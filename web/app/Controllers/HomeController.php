@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\SensorModel;
 use App\View;
+use App\Request;
 
 class HomeController {
     /**
@@ -10,7 +11,7 @@ class HomeController {
      *
      * @return void
      */
-    public function index() {
+    public function index(Request $request) {
         $view = new View('home');
         $view->show();
     }

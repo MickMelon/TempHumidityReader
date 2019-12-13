@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Models\SensorModel;
 use App\Json;
 use App\Config;
+use App\Request;
 
 class ApiController {
     /**
@@ -25,7 +26,7 @@ class ApiController {
      *
      * @return void
      */
-    public function latest() {
+    public function latest(Request $request) {
         $latest = $this->sensorModel->latest();
 
         $json = new Json($latest, true);
@@ -38,9 +39,11 @@ class ApiController {
      *
      * @return void
      */
-    public function get() {
-        if (isset($_GET['time']) && (strtolower($_GET['time']) != 'all')) {
-            $data = $this->sensorModel->time($_GET['time'], 1);
+    public function get(Request $request) {
+        $params = $request->getParams();
+        
+        if (isset($params['time']) && (strtolower($params['time']) != 'all')) {
+            $data = $this->sensorModel->time($params['time'], 1);
         } else {
             $data = $this->sensorModel->all();
         }        
@@ -54,7 +57,7 @@ class ApiController {
      *
      * @return void
      */
-    public function create() {
+    public function create(Request $request) {
         if (!$this->validateClient()) {
             http_response_code(403);
             die('You are not allowed to access this resource.');
