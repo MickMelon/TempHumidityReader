@@ -5,12 +5,6 @@ use App\Models\SensorModel;
 use App\View;
 
 class HomeController {
-    private $sensorModel;
-
-    public function __construct() {
-        $this->sensorModel = new SensorModel();
-    }
-
     /**
      * Displays the main page.
      *

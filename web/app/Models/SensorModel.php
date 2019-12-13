@@ -5,6 +5,11 @@ use App\Database;
 use PDO;
 
 class SensorModel {
+    /**
+     * Get the latest sensor reading.
+     *
+     * @return json
+     */
     public function latest() {
         $db = Database::getInstance();
 
@@ -16,6 +21,13 @@ class SensorModel {
         return json_encode($query->fetch());
     }
 
+    /**
+     * Get all the records within a timeframe.
+     *
+     * @param string $time Hour, day, week, or month
+     * @param int $qty The number of $time, ie 4 hours
+     * @return json
+     */
     public function time($time, $qty) {
         if (!in_array($time, ['hour', 'day', 'week', 'month'])) {
             return json_encode('time param is invalid');
@@ -33,6 +45,11 @@ class SensorModel {
         return json_encode($query->fetchAll());
     }
 
+    /**
+     * Get all the sensor readings.
+     *
+     * @return json
+     */
     public function all() {
         $db = Database::getInstance();
 
@@ -43,6 +60,14 @@ class SensorModel {
         return json_encode($query->fetchAll());
     }
 
+    /**
+     * Save a sensor reading as a new record in the database.
+     *
+     * @param int $temperature HTU21D temperature.
+     * @param int $humidity HTU21D humidity.
+     * @param int $systemTemp Raspberry Pi system temperature.
+     * @return void
+     */
     public function save($temperature, $humidity, $systemTemp) {
         $db = Database::getInstance();
 

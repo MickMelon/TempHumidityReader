@@ -1,9 +1,6 @@
 <?php
 namespace App;
 
-/**
- * The Json ActionResult used to display Json data.
- */
 class Json
 {
     /**
@@ -18,8 +15,7 @@ class Json
      *
      * @param json $data the Json data.
      */
-    public function __construct($data, $encoded = false) 
-    {
+    public function __construct($data, $encoded = false) {
         if (!$encoded) {
             $data = json_encode($data);
         }
@@ -32,8 +28,7 @@ class Json
      *
      * @return void
      */
-    public function show()
-    {
+    public function show() {
         header('Content-Type: application/json');
         echo $this->data;
     }
