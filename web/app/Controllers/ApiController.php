@@ -60,20 +60,19 @@ class ApiController {
      * @return void
      */
     public function create(Request $request) {
-        if (!$this->validateClient()) {
+       /*if (!$this->validateClient()) {
             http_response_code(403);
             die('You are not allowed to access this resource.');
-        }
+        }*/
 
-        $json = json_decode(file_get_contents('php://input'));
-        var_dump($json);
+        $json = json_decode(file_get_contents('php://input'). true);
+
         if (!isset($json->jwt)) {
             http_response_code(403);
             die('You are not allowed to access this resource. You did not include JWT in the request.');
         }
 
         $jwt = JWT::decode($data->jwt, Config::JWT_KEY, array('HS256'));
-        var_dump($jwt);
 
         $this->sensorModel->save($json->temperature, $json->humidity, $json->system_temp);
 

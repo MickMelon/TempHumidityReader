@@ -12,12 +12,17 @@ class Router {
      * @return void
      */
     public function start() {
+        
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         $params = $this->getParams($requestMethod);
         $request = new Request($requestMethod, $params);
 
         $controller = $this->getRequestedController();
         $action = $this->getRequestedAction();
+
+        var_dump($params);
+        echo "Controller: $controller / Action: $action";
+        return;
 
         $className = 'App\Controllers\\' . ucfirst($controller) . 'Controller';
 
@@ -63,7 +68,7 @@ class Router {
      * @return string
      */
     private function getRequestedController() {
-        return isset($_GET['c']) ? filter_input(INPUT_GET, $_GET['c']) : 'home';
+        return isset($_GET['c']) ? $_GET['c'] : 'home';
     }
 
     /**
@@ -72,6 +77,6 @@ class Router {
      * @return string
      */
     private function getRequestedAction() {
-        return isset($_GET['a']) ? filter_input(INPUT_GET, $_GET['a']) : 'index';
+        return isset($_GET['a']) ? $_GET['a'] : 'index';
     }
 }
