@@ -20,10 +20,6 @@ class Router {
         $controller = $this->getRequestedController();
         $action = $this->getRequestedAction();
 
-        var_dump($params);
-        echo "Controller: $controller / Action: $action";
-        return;
-
         $className = 'App\Controllers\\' . ucfirst($controller) . 'Controller';
 
         // Check to see if the class and method exist, if they do, call it.      

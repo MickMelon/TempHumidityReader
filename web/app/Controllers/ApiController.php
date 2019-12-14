@@ -67,16 +67,21 @@ class ApiController {
 
         $json = json_decode(file_get_contents('php://input'). true);
 
-        if (!isset($json->jwt)) {
+        if (!isset($json['jwt'])) {
             http_response_code(403);
             die('You are not allowed to access this resource. You did not include JWT in the request.');
         }
 
-        $jwt = JWT::decode($data->jwt, Config::JWT_KEY, array('HS256'));
+        try {
+            $jwt = JWT::decode($json['jwt'], Config::JWT_KEY, array('HS256'));
+        } catch (Exception $e) {
+            http_response_code(403);
+            die('JWT is invalid.');
+        }        
 
-        $this->sensorModel->save($json->temperature, $json->humidity, $json->system_temp);
+        $this->sensorModel->save($jwt->temperature, $jwt->humidity, 0);
 
-        $showJson = new Json(['message' => "Received data: [temp:$json->temperature|hum:$json->humidity|systmp:$json->system_temp]"]);
+        $showJson = new Json(['message' => "Received data: [temp:$jwt->temperature|hum:$jwt->humidity|systmp:0]"]);
     }
 
     /**
