@@ -60,10 +60,10 @@ class ApiController {
      * @return void
      */
     public function create(Request $request) {
-       /*if (!$this->validateClient()) {
+        if (!$this->validateClient()) {
             http_response_code(403);
             die('You are not allowed to access this resource.');
-        }*/
+        }
 
         $json = json_decode(file_get_contents('php://input'). true);
 
@@ -79,7 +79,7 @@ class ApiController {
             die('JWT is invalid.');
         }        
 
-        $this->sensorModel->save($jwt->temperature, $jwt->humidity, 0);
+        $this->sensorModel->save($jwt->temperature, $jwt->humidity, $jwt->piTemp);
 
         $showJson = new Json(['message' => "Received data: [temp:$jwt->temperature|hum:$jwt->humidity|systmp:0]"]);
     }

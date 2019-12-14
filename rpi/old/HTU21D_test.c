@@ -11,15 +11,37 @@
 #include "HTU21D.h"
 
 #define API_ADDRESS "https://54.163.93.215/api/create"
+#define JWT_KEY "duAM1RgJQO77LY7AkR8dMQO2JdURQ6ZU"
+#define SLEEP_SECONDS 3
 
-char* createKey() {
-	unsigned char key[32] = "TestKeyMate";
+/**
+ * Creates an encoded JSON web token that contains the HTU21D
+ * readings. This is required by the PHP on the server.
+ * 
+ * @param float temperature The HTU21D temperature reading.
+ * @param float humidity The HTU21D humidity reading.
+ * @param float piTemp The Raspberry Pi temperature.
+ * 
+ * @return char* The encoded JWT.
+ */ 
+char* createEncodedJWT(float temperature, float humidity, float piTemp) {
+	unsigned char key[32] = JWT_KEY;
 	jwt_t *jwt = NULL;
 	int ret = 0;
 	char *encoded;
+	char strTemperature[50];
+	char strHumidity[50];
+	char strPiTemp[50];
+
+	// Convert the temperature and humidity into strings so 
+	// they can be used with the jwt_add_grant() function.
+	sprintf(strTemperature, "%e", temperature);
+	sprintf(strHumidity, "%e", humidity);
+	sprintf(strPiTemp, "%e", piTemp);
 
 	printf("Creating new JWT key\n");
 
+	// Create new JWT object
 	ret = jwt_new(&jwt);
 	if (ret) {
 		printf("Error creating new JWT (return: %i)\n", ret);
@@ -28,39 +50,24 @@ char* createKey() {
 
 	printf("JWT created\n");
 
-	ret = jwt_add_grant(jwt, "iss", "http://iss.com");
-	if (ret) {
-		printf("Error adding iss grant: %d\n", ret);
-		return NULL;
-	}
-
-	ret = jwt_add_grant(jwt, "aud", "http://aud.com");
-	if (ret) {
-		printf("Error adding aud grant: %d\n", ret);
-		return NULL;
-	}
-
-	ret = jwt_add_grant(jwt, "iat", "1356999524");
-	if (ret) {
-		printf("Error adding iat grant: %d\n", ret);
-		return NULL;
-	}
-
-	ret = jwt_add_grant(jwt, "nbv", "1357000000");
-	if (ret) {
-		printf("Error adding nbv grant: %d\n", ret);
-		return NULL;
-	}
-
-	ret = jwt_add_grant(jwt, "temperature", "123.123");
+	// Add temperature
+	ret = jwt_add_grant(jwt, "temperature", strTemperature);
 	if (ret) {
 		printf("Error adding temperature grant: %d\n", ret);
 		return NULL;
 	}
 
-	ret = jwt_add_grant(jwt, "humidity", "50.50");
+	// Add humidity
+	ret = jwt_add_grant(jwt, "humidity", strHumidity);
 	if (ret) {
 		printf("Error adding humidity grant: %d\n", ret);
+		return NULL;
+	}
+
+	// Add pi temp
+	ret = jwt_add_grant(jwt, "piTemp", piTemp);
+	if (ret) {
+		printf("Error adding piTemp grant: %d\n", ret);
 		return NULL;
 	}
 
@@ -75,6 +82,7 @@ char* createKey() {
 
 	printf("JWT algorithm set\n");
 
+	// Encode JWT object into a string
 	encoded = jwt_encode_str(jwt);
 	if (!encoded) {
 		printf("Error encoding JWT: %d\n", ret);
@@ -88,18 +96,26 @@ char* createKey() {
 	return encoded;
 }
 
+/**
+ * Gets the temperature of the Raspberry Pi by issuing
+ * a shell command and reading the output.
+ * 
+ * @return float The system temperature
+ */ 
 float getSystemTemperature() {
 	FILE *fp;
 	char path[100];
 	char *ptr;
 	double systemTemp;
 
+	// Run the measure temp shell command
 	fp = popen("vcgencmd measure_temp | egrep -o '[0-9]*\\.[0-9]*'", "r");
 	if (fp == NULL) {
 		printf("Could not read system temperature\n");
 		return 0;
 	}
 
+	// Get the output
 	while (fgets(path, 100, fp) != NULL) {
 		systemTemp = strtod(path, &ptr);
 	}
@@ -111,8 +127,12 @@ float getSystemTemperature() {
 
 /**
  * Makes a HTTP POST request to the AWS server with the sensor readings.
+ * 
+ * @param char* jsonObj The JSON object to be sent to the server.
+ * 
+ * @return int Result code.
  */ 
-int sendToServer(float temperature, float humidity, float systemTemp) {
+int sendToServer(char* jsonObj) {
 	CURL *curl;
 	CURLcode res;
 
@@ -122,27 +142,12 @@ int sendToServer(float temperature, float humidity, float systemTemp) {
 		return 128;
 	}
 
-	char* key = createKey();
-	if (key == NULL) {
-		printf("Error creating the JWT key!\n");
-		return -1;
-	}
-
-	
-	//sprintf(jsonObj, "{ \"temperature\": \"%lf\", \"humidity\": \"%lf\", \"system_temp\": \"%lf\" }",
-	//	temperature, humidity, systemTemp);
-	char jsonObj[512];
-	printf("Key is: %s\n", key);
-
-	sprintf(jsonObj, "{ \"jwt\": \"%s\" }", key);
-
 	struct curl_slist *headers = NULL;
 	headers = curl_slist_append(headers, "Accept: application/json");
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	headers = curl_slist_append(headers, "charsets: utf-8");
 
 	curl_easy_setopt(curl, CURLOPT_URL, API_ADDRESS);
-
 	curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, jsonObj);
@@ -156,40 +161,48 @@ int sendToServer(float temperature, float humidity, float systemTemp) {
 
 	curl_easy_cleanup(curl);
 	curl_global_cleanup();
+
 	return res;
 }
 
-void sendPeriodically() {
-	int fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
-	if ( 0 > fd )
-	{
-		fprintf (stderr, "Unable to open I2C device: %s\n", strerror (errno));
-		exit (-1);
+/**
+ * The entry point to the program. Inits WiringPi and sends 
+ * the HTU21D reading to the server periodically.
+ * 
+ * @return int
+ */ 
+int main() {
+	int fd, res;
+	struct Reading reading;
+	float piTemp;
+
+	wiringPiSetup();
+
+	fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
+	if (fd < 0) {
+		fprintf(stderr, "Unable to open I2C device: %s\n", strerror(errno));
+		exit(-1);
 	}
 	
-//	double temperature = getTemperature(fd);
-//	//double humidity = getHumidity(fd);
-//	double systemTemp = getSystemTemperature();
-
-	struct Reading r = getReading(fd);
-	
-	printf("\nSensor temp: %5.2fC\n", r.temperature);
-	printf("Humidity: %5.2f%%rh\n", r.humidity);
-	//printf("System temp: %5.2fC\n", systemTemp);
-
-	printf("Sending to server...\n");
-
-	int res = sendToServer(r.temperature, r.humidity, 0);
-	
-	printf("Sent to server. got result code: %i \n", res);
-}
-
-int main() {
-	wiringPiSetup();
-		
 	while (1) {
-		sendPeriodically();
-		sleep(1);
+		reading = getHTU21DReading(fd);
+		piTemp = getSystemTemperature();
+
+		char* jwt = createEncodedJWT(reading.temperature, reading.humidity, piTemp);
+		if (jwt == NULL) {
+			printf("Error creating the JWT!\n");
+			return -1;
+		}
+
+		printf("JWT = %s\n", jwt);
+
+		char jsonObj[512];
+		sprintf(jsonObj, "{ \"jwt\": \"%s\" }", jwt);
+
+		res = sendToServer(jsonObj);
+		printf("Sent to server. Result code: %d\n", res);
+
+		sleep(SLEEP_SECONDS);
 	}
 
 	return 0;

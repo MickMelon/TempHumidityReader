@@ -10,6 +10,11 @@
 /**
  * Issue a write command to read a value from HTU21D. 
  * Commands are listed in the header file.
+ * 
+ * @param int fd The HTU21D file.
+ * @param int cmd The command (see HTU21D.h)
+ * 
+ * @return u_int16_t The value read after executing the command
  */ 
 u_int16_t readValue(int fd, int cmd) {
 	unsigned char buf[4];
@@ -24,6 +29,11 @@ u_int16_t readValue(int fd, int cmd) {
 
 /**
  * Calculate the dew point and return in degrees C.
+ * 
+ * @param float temperature Reading from HTU21D
+ * @param float relativeHumidity Reading from HTU21D
+ * 
+ * @return float Dew point
  */ 
 float computeDewPoint(float temperature, float relativeHumidity) {
 	float partialPressure;
@@ -37,6 +47,11 @@ float computeDewPoint(float temperature, float relativeHumidity) {
 
 /**
  * Returns the compensated humidity in %RH.
+ * 
+ * @param float temperature Reading from HTU21D
+ * @param float relativeHumidity Reading from HTU21D
+ * 
+ * @return float Compensated humidity.
  */ 
 float computeCompensatedHumidity(float temperature, float relativeHumidity) {
 	return (relativeHumidity + (25 - temperature) * HTU21D_TEMPERATURE_COEFFICIENT);
@@ -44,6 +59,10 @@ float computeCompensatedHumidity(float temperature, float relativeHumidity) {
 
 /**
  * Read the relative humidity level from HTU21D in %RH.
+ * 
+ * @param int HTU21D file.
+ * 
+ * @return float Relative humidity.
  */ 
 float getRelativeHumidity(int fd)
 {
@@ -54,6 +73,10 @@ float getRelativeHumidity(int fd)
 /**
  * Read the temperature from HTU21D and carry out the conversions
  * to get the actual temperature in C.
+ * 
+ * @param int HTU21D file.
+ * 
+ * @return float Temperature.
  */ 
 float getTemperature(int fd)
 {
@@ -64,8 +87,12 @@ float getTemperature(int fd)
 /**
  * The interface function that gets all the readings from
  * HTU21D and returns it in a struct.
+ * 
+ * @int fd HTU21D file.
+ * 
+ * @return struct Reading
  */ 
-struct Reading getReading(int fd) {
+struct Reading getHTU21DReading(int fd) {
 	float temperature = getTemperature(fd);
 	float humidity = getRelativeHumidity(fd);
 

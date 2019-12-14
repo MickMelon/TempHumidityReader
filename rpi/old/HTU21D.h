@@ -23,6 +23,6 @@ struct Reading {
 	float humidity;
 };
 
-struct Reading getReading(int fd);
+struct Reading getHTU21DReading(int fd);
 
 #endif
