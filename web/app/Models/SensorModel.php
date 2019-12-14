@@ -63,9 +63,10 @@ class SensorModel {
     /**
      * Save a sensor reading as a new record in the database.
      *
-     * @param int $temperature HTU21D temperature.
-     * @param int $humidity HTU21D humidity.
-     * @param int $systemTemp Raspberry Pi system temperature.
+     * @param float $temperature HTU21D temperature.
+     * @param float $humidity HTU21D humidity.
+     * @param float $systemTemp Raspberry Pi system temperature.
+     * 
      * @return void
      */
     public function save($temperature, $humidity, $systemTemp) {

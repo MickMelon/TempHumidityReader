@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#include <jwt.h>
 #include "wiringPi.h"
 #include "wiringPiI2C.h"
 #include <curl/curl.h>
@@ -11,6 +12,32 @@
 
 #define API_ADDRESS "https://35.174.12.122/api/create"
 
+char* createKey() {
+	unsigned char key[32] = "TestKeyMate";
+	jwt_t *jwt = NULL;
+	int ret = 0;
+	char *output;
+
+	ret = jwt_new(&jwt);
+	if (ret > 0) {
+		printf("Error creating new JWT (return: %i)\n", ret);
+		return;
+	}
+
+	// Set algorithm
+	jwt_set_alg(jwt, JWT_ALG_HS256, key, sizeof(key));
+
+	jwt_add_grant(jwt, "iss", "54.163.93.215");
+	jwt_add_grant(jwt, "aud", "89.238.154.167");
+	jwt_add_grant(jwt, "iat", 1356999524);
+	jwt_add_grant(jwt, "nbv", 1357000000);
+	jwt_add_grant(jwt, "temperature", 123.123);
+	jwt_add_grant(jwt, "humidity", 50.50);
+
+
+	out = jwt_encode_str(jwt);
+	return out;
+}
 
 float getSystemTemperature() {
 	FILE *fp;
@@ -46,9 +73,15 @@ int sendToServer(float temperature, float humidity, float systemTemp) {
 		return 128;
 	}
 
+	char* key = createKey();
+
 	char jsonObj[100];
-	sprintf(jsonObj, "{ \"temperature\": \"%lf\", \"humidity\": \"%lf\", \"system_temp\": \"%lf\" }",
-		temperature, humidity, systemTemp);
+	//sprintf(jsonObj, "{ \"temperature\": \"%lf\", \"humidity\": \"%lf\", \"system_temp\": \"%lf\" }",
+	//	temperature, humidity, systemTemp);
+
+	sprintf(jsonObj, "{ \"jwt\": \"%s\" }", key);
+
+	jwt_t *jwt = createKey();
 
 	struct curl_slist *headers = NULL;
 	headers = curl_slist_append(headers, "Accept: application/json");

@@ -32,7 +32,7 @@ class Router {
 
         // Just call the home controller index if none was specified
         $homeController = new Controllers\HomeController();
-        $homeController->index();             
+        $homeController->index($request);             
     }
 
     /**

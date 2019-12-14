@@ -6,6 +6,8 @@ use App\Json;
 use App\Config;
 use App\Request;
 
+use \Firebase\JWT\JWT;
+
 class ApiController {
     /**
      * The SensorModel
@@ -63,8 +65,14 @@ class ApiController {
             die('You are not allowed to access this resource.');
         }
 
-        $jsonbody = file_get_contents('php://input');
-        $json = json_decode($jsonbody, false);
+        $json = json_decode(file_get_contents('php://input'));
+        if (!isset($json->jwt)) {
+            http_response_code(403);
+            die('You are not allowed to access this resource. You did not include JWT in the request.');
+        }
+
+        $jwt = JWT::decode($data->jwt, Config::JWT_KEY, array('HS256'));
+        var_dump($jwt);
 
         $this->sensorModel->save($json->temperature, $json->humidity, $json->system_temp);
 
