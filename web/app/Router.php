@@ -14,10 +14,10 @@ class Router {
     public function start() {
         $requestMethod = $_SERVER['REQUEST_METHOD'];
         $params = $this->getParams($requestMethod);
-        $request = new Request($requestMethod, $params);        
+        $request = new Request($requestMethod, $params);
 
-        $controller = $this->getControllerFromParam($params);
-        $action = $this->getActionFromParam($params);
+        $controller = $this->getRequestedController();
+        $action = $this->getRequestedAction();
 
         $className = 'App\Controllers\\' . ucfirst($controller) . 'Controller';
 
@@ -62,8 +62,8 @@ class Router {
      *
      * @return string
      */
-    private function getControllerFromParam(array $params) {
-        return array_key_exists('c', $params) ? $params['c'] : 'home';
+    private function getRequestedController() {
+        return isset($_GET['c']) ? filter_input(INPUT_GET, $_GET['c']) : 'home';
     }
 
     /**
@@ -71,7 +71,7 @@ class Router {
      *
      * @return string
      */
-    private function getActionFromParam(array $params) {
-        return array_key_exists('a', $params) ? $params['a'] : 'index';
+    private function getRequestedAction() {
+        return isset($_GET['a']) ? filter_input(INPUT_GET, $_GET['a']) : 'index';
     }
 }

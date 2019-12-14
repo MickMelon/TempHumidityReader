@@ -10,33 +10,82 @@
 
 #include "HTU21D.h"
 
-#define API_ADDRESS "https://35.174.12.122/api/create"
+#define API_ADDRESS "https://54.163.93.215/api/create"
 
 char* createKey() {
 	unsigned char key[32] = "TestKeyMate";
 	jwt_t *jwt = NULL;
 	int ret = 0;
-	char *output;
+	char *encoded;
+
+	printf("Creating new JWT key\n");
 
 	ret = jwt_new(&jwt);
-	if (ret > 0) {
+	if (ret) {
 		printf("Error creating new JWT (return: %i)\n", ret);
-		return;
+		return NULL;
 	}
 
+	printf("JWT created\n");
+
+	ret = jwt_add_grant(jwt, "iss", "http://iss.com");
+	if (ret) {
+		printf("Error adding iss grant: %d\n", ret);
+		return NULL;
+	}
+
+	ret = jwt_add_grant(jwt, "aud", "http://aud.com");
+	if (ret) {
+		printf("Error adding aud grant: %d\n", ret);
+		return NULL;
+	}
+
+	ret = jwt_add_grant(jwt, "iat", "1356999524");
+	if (ret) {
+		printf("Error adding iat grant: %d\n", ret);
+		return NULL;
+	}
+
+	ret = jwt_add_grant(jwt, "nbv", "1357000000");
+	if (ret) {
+		printf("Error adding nbv grant: %d\n", ret);
+		return NULL;
+	}
+
+	ret = jwt_add_grant(jwt, "temperature", "123.123");
+	if (ret) {
+		printf("Error adding temperature grant: %d\n", ret);
+		return NULL;
+	}
+
+	ret = jwt_add_grant(jwt, "humidity", "50.50");
+	if (ret) {
+		printf("Error adding humidity grant: %d\n", ret);
+		return NULL;
+	}
+
+	printf("JWT grants added\n");
+
 	// Set algorithm
-	jwt_set_alg(jwt, JWT_ALG_HS256, key, sizeof(key));
+	ret = jwt_set_alg(jwt, JWT_ALG_HS256, key, sizeof(key));
+	if (ret) {
+		printf("Error setting JWT algorithm: %d\n", ret);
+		return NULL;
+	}
 
-	jwt_add_grant(jwt, "iss", "54.163.93.215");
-	jwt_add_grant(jwt, "aud", "89.238.154.167");
-	jwt_add_grant(jwt, "iat", 1356999524);
-	jwt_add_grant(jwt, "nbv", 1357000000);
-	jwt_add_grant(jwt, "temperature", 123.123);
-	jwt_add_grant(jwt, "humidity", 50.50);
+	printf("JWT algorithm set\n");
 
+	encoded = jwt_encode_str(jwt);
+	if (!encoded) {
+		printf("Error encoding JWT: %d\n", ret);
+		return NULL;
+	}
 
-	out = jwt_encode_str(jwt);
-	return out;
+	printf("JWT string encoded\n");
+
+	jwt_free(jwt);
+
+	return encoded;
 }
 
 float getSystemTemperature() {
@@ -74,14 +123,18 @@ int sendToServer(float temperature, float humidity, float systemTemp) {
 	}
 
 	char* key = createKey();
+	if (key == NULL) {
+		printf("Error creating the JWT key!\n");
+		return -1;
+	}
 
-	char jsonObj[100];
+	
 	//sprintf(jsonObj, "{ \"temperature\": \"%lf\", \"humidity\": \"%lf\", \"system_temp\": \"%lf\" }",
 	//	temperature, humidity, systemTemp);
+	char jsonObj[256];
+	printf("Key is: %s\n", key);
 
 	sprintf(jsonObj, "{ \"jwt\": \"%s\" }", key);
-
-	jwt_t *jwt = createKey();
 
 	struct curl_slist *headers = NULL;
 	headers = curl_slist_append(headers, "Accept: application/json");

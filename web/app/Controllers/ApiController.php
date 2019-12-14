@@ -66,6 +66,7 @@ class ApiController {
         }
 
         $json = json_decode(file_get_contents('php://input'));
+        var_dump($json);
         if (!isset($json->jwt)) {
             http_response_code(403);
             die('You are not allowed to access this resource. You did not include JWT in the request.');
