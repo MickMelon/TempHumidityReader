@@ -99,7 +99,7 @@ struct Reading getHTU21DReading(int fd) {
 	float dewPoint = computeDewPoint(temperature, humidity);
 	float compensatedHumidity = computeCompensatedHumidity(temperature, humidity);
 
-	printf("temp:%f|hum:%f|dew:%f|comp:%f\n", temperature, humidity, dewPoint, compensatedHumidity);
+	printf("HTU21D: temp:%f|hum:%f|dew:%f|comp:%f\n", temperature, humidity, dewPoint, compensatedHumidity);
 
 	struct Reading r = {.temperature = temperature, .humidity = humidity};
 	return r;

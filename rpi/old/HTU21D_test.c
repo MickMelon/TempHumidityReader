@@ -10,7 +10,7 @@
 
 #include "HTU21D.h"
 
-#define API_ADDRESS "https://54.163.93.215/api/create"
+#define API_ADDRESS "https://34.203.109.1/api/create"
 #define JWT_KEY "duAM1RgJQO77LY7AkR8dMQO2JdURQ6ZU"
 #define SLEEP_SECONDS 3
 
@@ -65,7 +65,7 @@ char* createEncodedJWT(float temperature, float humidity, float piTemp) {
 	}
 
 	// Add pi temp
-	ret = jwt_add_grant(jwt, "piTemp", piTemp);
+	ret = jwt_add_grant(jwt, "piTemp", strPiTemp);
 	if (ret) {
 		printf("Error adding piTemp grant: %d\n", ret);
 		return NULL;
@@ -176,8 +176,9 @@ int main() {
 	struct Reading reading;
 	float piTemp;
 
+	// Setup WiringPi and attempt to get the HTU21D device
+	// If it's not connected, the program will exit
 	wiringPiSetup();
-
 	fd = wiringPiI2CSetup(HTU21D_I2C_ADDR);
 	if (fd < 0) {
 		fprintf(stderr, "Unable to open I2C device: %s\n", strerror(errno));
@@ -185,23 +186,29 @@ int main() {
 	}
 	
 	while (1) {
+		// Get the readings from HTU21D and Pi
 		reading = getHTU21DReading(fd);
 		piTemp = getSystemTemperature();
 
+		// Create the JSON web token
 		char* jwt = createEncodedJWT(reading.temperature, reading.humidity, piTemp);
 		if (jwt == NULL) {
 			printf("Error creating the JWT!\n");
 			return -1;
 		}
 
+		// Show the JWT
 		printf("JWT = %s\n", jwt);
 
+		// Create a JSON object with the JWT
 		char jsonObj[512];
 		sprintf(jsonObj, "{ \"jwt\": \"%s\" }", jwt);
 
+		// Send the JSON to the server
 		res = sendToServer(jsonObj);
 		printf("Sent to server. Result code: %d\n", res);
 
+		// Sleep for a few seconds
 		sleep(SLEEP_SECONDS);
 	}
 

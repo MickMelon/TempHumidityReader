@@ -7,7 +7,7 @@ class Config {
      */
     const DB_SERVER = '127.0.0.1';
     const DB_NAME = 'miniproject';
-    const DB_USER = 'root';
+    const DB_USER = 'michael';
     const DB_PASS = 'P@ssw0rd';
 
     /**
@@ -17,7 +17,7 @@ class Config {
         '127.0.0.1',
         'localhost',
         '92.6.90.248', // My IP
-        '54.163.93.215' // AWS IP
+        '34.203.109.1' // AWS IP
     );
 
     /**
