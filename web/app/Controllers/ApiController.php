@@ -65,7 +65,7 @@ class ApiController {
             die('You are not allowed to access this resource.');
         }
 
-        $json = json_decode(file_get_contents('php://input'). true);
+        $json = json_decode(file_get_contents('php://input'), true);
 
         if (!isset($json['jwt'])) {
             http_response_code(403);
