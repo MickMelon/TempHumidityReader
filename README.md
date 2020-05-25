@@ -15,6 +15,8 @@ The aim of this project is to build a temperature and humidity reading system th
 
 This project is split into three sections: hardware, cloud, and web application. The hardware will consist of setting up a Raspberry Pi with a HTU21D humidity sensor and writing the code to read the sensor. The humidity and temperature readings will be sent to the web application API on a cloud server which will in turn store the readings in a database. The readings will then be displayed to the user on a web page. Each section will have its own security requirements as they will involve working with different technologies. 
 
+![Overall system architecture](architecture.jpg)
+
 ### Hardware
 
 The pieces of hardware that have been used for this project are: 
@@ -32,6 +34,8 @@ A tutorial written by leon-anavi was used as a reference in setting up the hardw
 | GND (ground) | GND | 9 |
 | SDA (data line) | GPIO3 | 5 |
 | SCL (clock line) | GPIO2 | 3 |
+
+![HTU21D wired up to the Raspberry Pi](raspberrypi.jpg)
 
 The build-essential and i2c-tools packages were installed on the Raspberry Pi and the I2C module was enabled via raspi-config to enable use of the I2C interface to communicate with HTU21D (Robot Electronics, n.d.). 
 
@@ -54,6 +58,8 @@ The ModSecurity and ModEvasive Apache modules were installed for intrusion detec
 ### Web Application
 
 An API was developed in PHP following the Model-View-Controller (MVC) design pattern. Three API methods were created: get, latest, and create. Get and latest are available for all users but create, as seen in figure 8, will only work from a whitelisted IP address and valid JWT. The php-jwt library was used for decoding the tokens (Firebase, 2019). This prevents unauthorised users from creating new database records.  The API receives input from the user, which can never be trusted, therefore all input from external sources was sanitised. PDO was used to allow for prepared MySQL statements which prevents SQL injection attacks. A simple HTML interface  was created to display the latest sensor readings and a visual representation using Chart.js and updated periodically using AJAX 
+
+![HTML Interface](interface.jpg)
 
 ## Conclusion
 
